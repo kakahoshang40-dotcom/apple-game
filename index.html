@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Apple Snake Game</title>
+<style>
+  body {.apple {
+  width: 80px;
+  height: 80px;
+  background: url("https://cdn-icons-png.flaticon.com/512/415/415682.png");
+  background-size: cover;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.apple:hover {
+  transform: scale(1.1);
+}
+
+.opened {
+  animation: pop 0.3s ease;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.5); }
+  100% { transform: scale(1); }
+}
+    text-align: center;
+    font-family: Arial;
+    background: #222;
+    color: white;
+  }
+  .grid {
+    .grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  width: 90%;
+  max-width: 300px;
+  margin: auto;
+}
+    display: grid;
+    grid-template-columns: repeat(3, 80px);
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  .apple {
+    width: 80px;
+    height: 80px;
+    background: red;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<h1>🍎 Apple Game 🐍</h1>
+<h2 id="round">Round: 1</h2>
+<h3 id="score">Score: 0</h3>
+<h3 id="status">Pick apples, avoid snakes!</h3>
+
+<div class="grid" id="grid"></div>
+
+<button onclick="restartGame()">Restart 🔁</button>
+
+<script>
+let round = 1;
+let maxRounds = 3;
+let apples = 3;
+let snakes = 1;
+let opened = 0;
+let score = 0;
+
+function startRound() {
+  document.getElementById("round").innerText = "Round: " + round;
+  document.getElementById("status").innerText = "Pick apples!";
+  document.getElementById("grid").innerHTML = "";
+  opened = 0;
+
+  // 👇 Round'a göre yılan sayısı ayarla
+  if (round === 1) snakes = 1;
+  if (round === 2) snakes = 2;
+  if (round === 3) snakes = 2; // 👈 DÜZELTİLDİ
+
+  let snakePositions = [];
+
+  while (snakePositions.length < snakes) {
+    let rand = Math.floor(Math.random() * apples);
+    if (!snakePositions.includes(rand)) {
+      snakePositions.push(rand);
+    }
+  }
+
+  for (let i = 0; i < apples; i++) {
+    let div = document.createElement("div");
+    div.className = "apple";
+    div.innerText = "🍎";
+
+    div.onclick = function () {
+      if (div.classList.contains("opened")) return;
+
+      div.classList.add("opened");
+
+      if (snakePositions.includes(i)) {
+        div.innerText = "🐍";
+        document.getElementById("status").innerText = "Game Over!";
+        disableAll();
+      } else {
+        div.innerText = "🍏";
+        opened++;
+        score += 10;
+        document.getElementById("score").innerText = "Score: " + score;
+
+        if (opened === apples - snakes) {
+          nextRound();
+        }
+      }
+    };
+
+    document.getElementById("grid").appendChild(div);
+  }
+}
+
+function disableAll() {
+  let all = document.getElementsByClassName("apple");
+  for (let el of all) {
+    el.onclick = null;
+  }
+}
+
+function nextRound() {
+  round++;
+
+  if (round > maxRounds) {
+    document.getElementById("status").innerText = "You Win! 🎉";
+    disableAll();
+  } else {
+    document.getElementById("status").innerText = "Next Round...";
+    setTimeout(startRound, 1000);
+  }
+}
+
+function restartGame() {
+  round = 1;
+  score = 0;
+  document.getElementById("score").innerText = "Score: 0";
+  document.getElementById("status").innerText = "Game Restarted!";
+  startRound();
+}
+
+startRound();
+</script>
+
+</body>
+</html>
